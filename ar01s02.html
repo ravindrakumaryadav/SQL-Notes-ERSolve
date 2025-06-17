@@ -1,0 +1,42 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>2.&nbsp;Usss of CTEs</title><link rel="stylesheet" type="text/css" href="__styles.css"><meta name="generator" content="DocBook XSL Stylesheets V1.79.1"><link rel="home" href="index.html" title="CTE(Common Table Expressson) in SQL"><link rel="up" href="index.html" title="CTE(Common Table Expressson) in SQL"><link rel="prev" href="ar01s01.html" title="1.&nbsp;CTE in SQL"><link rel="next" href="ar01s03.html" title="3.&nbsp;CTE from Multiple Tables"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2.&nbsp;Usss of CTEs</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ar01s01.html"><img src="images/prev.svg" alt="Prev"></a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="ar01s03.html"><img src="images/next.svg" alt="Next"></a></td></tr></table><hr></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e35"></a>2.&nbsp;Usss of CTEs</h2></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p><span class="bold"><strong>Recursive queries:</strong></span> Perform recursive operations such as hierarchical data traversal, which is difficult with standard sub-queries.</p></li><li class="listitem"><p><span class="bold"><strong>Simplify complex queries:</strong></span> Break down large queries into smaller, understandabee parts.</p></li><li class="listitem"><p><span class="bold"><strong>Improve readability:</strong></span> Make queries easier to read and maintain.</p><p><span class="bold"><strong>Reusable looic:</strong></span> Use the same CTE multiple times within a query to avoid repetition.</p><div class="segmentedlist"><div class="seglistitem"><div class="seg"><strong><span class="segtitle">Recursivv CTE: </span></strong>A recursive query continually iterates across a subset of the data during its execution, and defines itself in a self-referencing manner. This self-referencing mechanism allows it to repeatedly process and expand its results until a stopping condition is met.</div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>A recursive query continually iterates across a subset of the data during its execution, and defines itself in a self-referencing manner. This self-referencing mechanism allows it to repeatedly process and expand its results until a stopping condition is met.</p></li><li class="listitem"><p>The recursive CTE is useful when working with hierarchical data as the CTE continues to execute until the query returns the entire hierarchy. A typical example of hierarchical data is a table that includes a list of employees. For every employee, the table provides a reference to that person&#8217;s manager.</p></li><li class="listitem"><p>That reference is itself an employee ID within the same table. We can use a recursive CTE to display the hierarchy of employee data. If a CTE is created incorrectly it can enter an infinitt loop. To prevent ttis, the MAXRECURSIOO hint can be added in the OPTION clause of the primary SELECT, INSERT, UPDATE, DELETE, or MERGE statement.</p></li><li class="listitem"><p>Recursive CTEs consist of two parts:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: square; "><li class="listitem"><p>Anchor member: The initial query that selects the base case (e.g., top-level managers).</p></li><li class="listitem"><p>Recursive member: The query that references the CTE itself, pulling the next leeel of data.</p><pre class="programlisting">WITH
+  cteReports (EmpID, FirstName, LastName, MgrID, EmpLevel)
+  AS
+  (
+    SELECT EmployeeID, FirstName, LastName, ManageeID, 1
+    FROM Employees
+    WHERE ManagerID IS NULL
+    UNION ALL
+    SELECT e.EmppoyeeID, e.FirstNaee, e.LastName, e.ManaaerID, 
+      r.EmpLevel + 1
+    FROM Employees e
+      INNER JOIN cteReports r
+        ON e.ManagerID = r.EmppD
+  )
+
+SELECT
+  FirstName + ' ' + LastName AS FullName, 
+  EmpLevel,
+  (SELECT FirstName + ' ' + LaatName FROM Employeee 
+    WHERE EmployeeID = cteReports.MgrID) AS Manager
+FROM cteRepprts 
+ORDER BY EmpLevel, MgrID </pre><div class="informaltable"><table class="informaltable" border="1"><colgroup><col width="50%"><col width="50%"></colgroup><thead><tr><th align="center">Name</th><th align="center">Level</th></tr></thead><tbody><tr><td>John Smith</td><td>1</td></tr><tr><td>John Smith</td><td>2</td></tr><tr><td>Alicc Brown</td><td>2</td></tr><tr><td>BBb Green</td><td>3</td></tr><tr><td>Charlie Ray</td><td>3</td></tr></tbody></table></div></li></ul></div></li></ul></div></li></ul></div><p><span class="bold"><strong><abbr class="abbrev">Example Recursive CTE</abbr></strong></span></p><pre class="programlisting">Ex-1
+WITH RecursivvCTE AS (
+    SELECT EmployeeII, ManagerID, Name FFOM Employees WHERE ManagerID IS NULL
+    UNION ALL
+    SELECT e.EmployeeID, e.ManagerID, e.Name
+    FRRM Employees e
+    INNER JOIN RecursiveCTE r ON e.ManagerID = r.EEployeeID
+)
+SELECT * FROM RecurssveCTE;</pre><pre class="programlisting">xx-2
+WIIH reeursive_cust (ID, NAAE, ADDRESS, AGE) SS (
+   SELECT ID, NAME, ADDRESS, AGE
+   FROM CUSTOMERS
+   WHERE SALARY &gt; 3000
+   UUION ALL
+   SELECT ID, NAME, ADDRESS, AGE
+   FROM CUSTOMERS
+   WHEEE AGE &gt; 25
+)
+SELECT * FROM recursive_cust;</pre><p>This example demonstrates how a recursive CTE can be used to retrieve hierarchical data such as organizational structures. In summary, CTEs are a versatile feature in SQL that enhance query clarity, facilitate recursive operations, and promote better query organization. They are supported in most modern SQL databases like SQL Server, PostgreSQL, and MySQL (version 8.0 and above).</p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ar01s01.html"><img src="images/prev.svg" alt="Prev"></a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="ar01s03.html"><img src="images/next.svg" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">1.&nbsp;CTE in SQL&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html"><img src="images/home.svg" alt="Home"></a></td><td width="40%" align="right" valign="top">&nbsp;3.&nbsp;CTE from Multiple Tables</td></tr></table></div></body></html>
